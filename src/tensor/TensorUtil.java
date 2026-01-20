@@ -3,22 +3,11 @@ package tensor;
 public class TensorUtil {
 
     public static double[] multiply(double[][] matrix, double[] vector){
-        int cols = matrix[0].length;
-        int rows = matrix.length;
-        double[] output = new double[rows];
-        for (double[] doubles : matrix) {
-            for (int j = 0; j < rows; j++) {
-                output[j] = vector[j] * doubles[j];
-            }
-        }
-        return output;
-    }
-
-    public static double[] add(double[] vector1, double[] vector2){
-        int len = vector1.length;
+        int len = matrix.length;
         double[] output = new double[len];
-        for(int i = 0; i < len; i++)
-            output[i] = vector1[i] + vector2[i];
+        for (int i = 0; i < len; i++) {
+            output[i] = multiply(matrix[i], vector);
+        }
         return output;
     }
 
@@ -32,6 +21,21 @@ public class TensorUtil {
         return output;
     }
 
+    public static double multiply(double[] vector1, double[] vector2){
+        double out = 0;
+        for(int i = 0; i < vector1.length; i++){
+            out += vector1[i]*vector2[i];
+        }
+        return out;
+    }
+
+    public static double[] add(double[] vector1, double[] vector2){
+        int len = vector1.length;
+        double[] output = new double[len];
+        for(int i = 0; i < len; i++)
+            output[i] = vector1[i] + vector2[i];
+        return output;
+    }
     public static double[][] add(double[][] matrix, double[][] matrix2){
         double[][] output = new double[matrix.length][matrix[0].length];
         for(int i = 0; i < matrix.length; i++){
@@ -50,18 +54,25 @@ public class TensorUtil {
         return output;
     }
 
-    public static double loss(double[] actual, double[] predicted){
-        double output = 0;
+    public static double[] loss(double actual, double[] predicted){
+        double[] output = new double[predicted.length];
         for(int i = 0; i < predicted.length; i++){
-            output += 0.5*Math.pow(actual[i] - predicted[i], 2.0);
+            if(i == actual)
+                output[i] = Math.pow(1 - predicted[i], 2.0);
+            else
+                output[i] = Math.pow(0 - predicted[i], 2.0);
         }
         return output;
     }
 
-    public static double[] derivativeLoss(double[] actual, double[] predicted){
-        double[] output = new double[actual.length];
+
+    public static double[] derivativeLoss(double actual, double[] predicted){
+        double[] output = new double[predicted.length];
         for(int i = 0; i < predicted.length; i++){
-            output[i] = actual[i] - predicted[i];
+            if(i == actual)
+                output[i] = 2*(1 - predicted[i]);
+            else
+                output[i] = -2*(predicted[i]);
         }
         return output;
     }
@@ -72,6 +83,24 @@ public class TensorUtil {
             output[i] = 1.0/(1+Math.exp(vector[i]*-1.0));
         }
         return output;
+    }
+
+    public static double[] derivativeSigmoid(double[] sigmoids){
+        int len = sigmoids.length;
+        double[] deriv = new double[len];
+        for(int i = 0; i < len; i++){
+            deriv[i] = sigmoids[i] * (1 - sigmoids[i]);
+        }
+        return deriv;
+    }
+
+    public static String vectToString(double[] vector){
+        String out = "[";
+        for(double element : vector){
+            out += element + ", ";
+        }
+        out += "]";
+        return out;
     }
 
 
